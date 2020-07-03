@@ -23,8 +23,11 @@ public:
 private slots:
     void serialReceived();
 
+    void on_pushButton_clicked();
+
 private:
     Ui::MainWindow *ui;
+    comunicacaoSerial *comunicacaoSerial_;
     QVector<double> qv_x{0}, qv_y{0};
  //   comunicacaoSerial *comunicacaoSerial;
 };

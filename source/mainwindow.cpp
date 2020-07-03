@@ -46,15 +46,8 @@ MainWindow::MainWindow(QWidget *parent)
  *      Serial stuff
  ******************************************/
     serial = new QSerialPort(this);
-
-    serial->setPortName("ttyUSB0");
-    serial->setBaudRate(QSerialPort::Baud9600);
-    serial->setDataBits(QSerialPort::Data8);
-    serial->setParity(QSerialPort::NoParity);
-    serial->setStopBits(QSerialPort::OneStop);
-    serial->setFlowControl(QSerialPort::NoFlowControl);
-    serial->open(QIODevice::ReadWrite);
-
+    comunicacaoSerial_ = new comunicacaoSerial(serial);
+    ui->cb_serialDevices->addItems(comunicacaoSerial_->loadDevices());
     connect(serial,SIGNAL(readyRead()), this, SLOT(serialReceived()));
 
 
@@ -69,21 +62,37 @@ MainWindow::~MainWindow()
 void MainWindow::addPoint(double y)
 {
     qv_y.append(y);
-    qv_x.append(qv_x.last()+1);
+    qv_x.append(qv_x.last()+3);
+    ui->tx_receivedData->append(QString::number(y));
 }
 
 void MainWindow::plot()
 {
     ui->plot->graph(0)->setData(qv_x,qv_y);
     if(qv_x.last()>1000)
-        ui->plot->graph(0)->rescaleAxes();
+    {
+        double buffer;
+        buffer = qv_y.last();
+        qv_y.clear();
+        qv_y.push_back(buffer);
+        qv_x.clear();
+        qv_x.push_back(0);
+     }
+        //ui->plot->graph(0)->rescaleAxes();
     ui->plot->replot();
     ui->plot->update();
 }
 
 void MainWindow::serialReceived(){
     ui->label->setText(serial->readLine());
+    //ui->tx_receivedData;
     addPoint(ui->label->text().toDouble());
     plot();
     qDebug()<< "no data received";
+}
+
+void MainWindow::on_pushButton_clicked()
+{
+    comunicacaoSerial_->createConnection(ui->cb_serialDevices->currentText(),ui->cb_baudRate->currentText().toInt());
+    //serial->setPortName(ui->cb_serialDevices->currentText());
 }

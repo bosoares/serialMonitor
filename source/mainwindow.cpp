@@ -3,30 +3,77 @@
 #include <QSerialPort>
 #include <QDebug>
 
-
-QSerialPort *serial;
-QCustomPlot *graphic;
-//comunicacaoSerial *comunicacaoSerial_ = comunicacaoSerial_->getInstance();
-
+/* **********************************************************************
+ *              Constructor & Destructor
+ * **********************************************************************/
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
 {
+    //Initialize objects
     ui->setupUi(this);
-/********************************************
-*              Graphic stuff
-******************************************/
-  //  graphic = new QCustomPlot(this);
 
-    //graphic->addGraph();
-    //graphic->graph(0)->setPen(QPen(Qt::blue));
+    serial = new QSerialPort(this);
+    comunicacaoSerial_ = new comunicacaoSerial(serial);
+
+    //Setup Graphic environment
+    setGraphicEnvironment();
+
+    //Fill comboBoxes options
+    ui->cb_serialDevices->addItems(comunicacaoSerial_->loadDevices());
+
+    //Set signal(s)
+    connect(serial,SIGNAL(readyRead()), this, SLOT(serialReceived()));
+
+
+}
+
+MainWindow::~MainWindow()
+{
+    delete ui;
+    serial->close();
+}
+
+/* **********************************************************************
+ *              QtCustom plot configuration (graphic)
+ * **********************************************************************/
+
+//Configure grapgic style and parameters
+void MainWindow::setGraphicEnvironment()
+{
     ui->plot->addGraph();
     ui->plot->graph(0)->setPen(QPen(Qt::green));
     ui->plot->xAxis->setRange(0,1000);
     ui->plot->yAxis->setRange(-1,1);
 
+    ui->plot->yAxis->setLabelColor(Qt::white);
+    ui->plot->xAxis->setLabelColor(Qt::white);
+
+    ui->plot->xAxis->setLabel("Time");
+    ui->plot->yAxis->setLabel("Amplitude [v]");
+
+    ui->plot->xAxis->setBasePen(QPen(Qt::white, 1));
+    ui->plot->yAxis->setBasePen(QPen(Qt::white, 1));
+    ui->plot->xAxis->setTickPen(QPen(Qt::white, 1));
+    ui->plot->yAxis->setTickPen(QPen(Qt::white, 1));
+    ui->plot->xAxis->setSubTickPen(QPen(Qt::white, 1));
+    ui->plot->yAxis->setSubTickPen(QPen(Qt::white, 1));
+//    ui->plot->xAxis->setTickLabelColor(Qt::white);
+    ui->plot->xAxis->setTickLabels(false);
+    ui->plot->yAxis->setTickLabelColor(Qt::white);
+
     ui->plot->xAxis->grid()->setPen(QPen(QColor(140, 140, 140), 1, Qt::DotLine));
     ui->plot->yAxis->grid()->setPen(QPen(QColor(140, 140, 140), 1, Qt::DotLine));
+
+    ui->plot->xAxis->grid()->setSubGridPen(QPen(QColor(80, 80, 80), 1, Qt::DotLine));
+    ui->plot->yAxis->grid()->setSubGridPen(QPen(QColor(80, 80, 80), 1, Qt::DotLine));
+    ui->plot->xAxis->grid()->setSubGridVisible(true);
+    ui->plot->yAxis->grid()->setSubGridVisible(true);
+    ui->plot->xAxis->grid()->setZeroLinePen(Qt::NoPen);
+    ui->plot->yAxis->grid()->setZeroLinePen(Qt::NoPen);
+
+    //ui->plot->yAxis->setUpperEnding(QCPLineEnding::esSpikeArrow);
+    ui->plot->xAxis->setUpperEnding(QCPLineEnding::esSpikeArrow);
 
     QLinearGradient plotGradient;
     plotGradient.setStart(0,-1);
@@ -42,30 +89,13 @@ MainWindow::MainWindow(QWidget *parent)
     axisRectGradient.setColorAt(1, QColor(30, 30, 30));
     ui->plot->axisRect()->setBackground(axisRectGradient);
 
-/********************************************
- *      Serial stuff
- ******************************************/
-    serial = new QSerialPort(this);
-    comunicacaoSerial_ = new comunicacaoSerial(serial);
-    ui->cb_serialDevices->addItems(comunicacaoSerial_->loadDevices());
-    connect(serial,SIGNAL(readyRead()), this, SLOT(serialReceived()));
-
-
 }
 
-MainWindow::~MainWindow()
-{
-    delete ui;
-    serial->close();
-}
+/* **********************************************************************
+ *              Data display
+ * **********************************************************************/
 
-void MainWindow::addPoint(double y)
-{
-    qv_y.append(y);
-    qv_x.append(qv_x.last()+3);
-    ui->tx_receivedData->append(QString::number(y));
-}
-
+//Plot and display data in the graphic
 void MainWindow::plot()
 {
     ui->plot->graph(0)->setData(qv_x,qv_y);
@@ -78,19 +108,33 @@ void MainWindow::plot()
         qv_x.clear();
         qv_x.push_back(0);
      }
-        //ui->plot->graph(0)->rescaleAxes();
     ui->plot->replot();
     ui->plot->update();
 }
 
+/* **********************************************************************
+ *              Serial communication
+ * **********************************************************************/
+
+//Handles serial reception signal
 void MainWindow::serialReceived(){
     ui->label->setText(serial->readLine());
-    //ui->tx_receivedData;
     addPoint(ui->label->text().toDouble());
     plot();
-    //qDebug()<< "no data received";
 }
 
+//Save data from serial port
+void MainWindow::addPoint(double y)
+{
+    qv_y.append(y);
+    qv_x.append(qv_x.last()+3);
+    ui->tx_receivedData->append(QString::number(y));
+}
+
+
+/* **********************************************************************
+ *              Control Elements Actions (Buttons & etc
+ * **********************************************************************/
 void MainWindow::on_pb_connect_clicked()
 {
     if(comunicacaoSerial_->createConnection(ui->cb_serialDevices->currentText(),ui->cb_baudRate->currentText().toInt()))
@@ -104,7 +148,6 @@ void MainWindow::on_pb_connect_clicked()
     {
         qDebug() << "Connection not possible.";
     }
-    //serial->setPortName(ui->cb_serialDevices->currentText());
 }
 
 void MainWindow::on_pb_disconnect_clicked()

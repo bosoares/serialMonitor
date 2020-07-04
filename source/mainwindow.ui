@@ -32,7 +32,7 @@
      <rect>
       <x>10</x>
       <y>260</y>
-      <width>1051</width>
+      <width>1091</width>
       <height>301</height>
      </rect>
     </property>
@@ -48,6 +48,9 @@
     </property>
     <property name="title">
      <string>Serial Connection</string>
+    </property>
+    <property name="flat">
+     <bool>false</bool>
     </property>
     <widget class="QLabel" name="label_2">
      <property name="geometry">

@@ -14,7 +14,7 @@ public:
     // QSerialPort *serial;
     QStringList loadDevices();
     bool createConnection(QString device, uint32_t baudRate);
-    void closeConnection();
+    bool closeConnection();
 protected:
     QSerialPort *myDevice;
 };

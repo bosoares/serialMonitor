@@ -88,11 +88,36 @@ void MainWindow::serialReceived(){
     //ui->tx_receivedData;
     addPoint(ui->label->text().toDouble());
     plot();
-    qDebug()<< "no data received";
+    //qDebug()<< "no data received";
 }
 
-void MainWindow::on_pushButton_clicked()
+void MainWindow::on_pb_connect_clicked()
 {
-    comunicacaoSerial_->createConnection(ui->cb_serialDevices->currentText(),ui->cb_baudRate->currentText().toInt());
+    if(comunicacaoSerial_->createConnection(ui->cb_serialDevices->currentText(),ui->cb_baudRate->currentText().toInt()))
+    {
+        ui->cb_serialDevices->setEnabled(false);
+        ui->cb_baudRate->setEnabled(false);
+        ui->pb_connect->setEnabled(false);
+        ui->pb_disconnect->setEnabled(true);
+    }
+    else
+    {
+        qDebug() << "Connection not possible.";
+    }
     //serial->setPortName(ui->cb_serialDevices->currentText());
+}
+
+void MainWindow::on_pb_disconnect_clicked()
+{
+     if (comunicacaoSerial_->closeConnection())
+     {
+         ui->cb_serialDevices->setEnabled(true);
+         ui->cb_baudRate->setEnabled(true);
+         ui->pb_connect->setEnabled(true);
+         ui->pb_disconnect->setEnabled(false);
+     }
+     else
+     {
+         qDebug() << "Connection not possible.";
+     }
 }

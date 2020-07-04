@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QDebug>
 #include <QSerialPort>
 #include "comunicacaoserial.h"
 
@@ -21,9 +22,12 @@ public:
     void plot();
 
 private slots:
+    //Custom signals
     void serialReceived();
 
-    void on_pushButton_clicked();
+    // Graphical elements
+    void on_pb_connect_clicked();
+    void on_pb_disconnect_clicked();
 
 private:
     Ui::MainWindow *ui;

@@ -17,12 +17,14 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += \
     comunicacaoserial.cpp \
+    filecontrol.cpp \
     main.cpp \
     mainwindow.cpp \
     qcustomplot.cpp
 
 HEADERS += \
     comunicacaoserial.h \
+    filecontrol.h \
     mainwindow.h \
     qcustomplot.h
 

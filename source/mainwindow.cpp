@@ -20,6 +20,7 @@ MainWindow::MainWindow(QWidget *parent)
     setGraphicEnvironment();
 
     //Fill comboBoxes options
+    setIcons();
     ui->cb_serialDevices->addItems(comunicacaoSerial_->loadDevices());
 
     //Set signal(s)
@@ -39,6 +40,12 @@ MainWindow::~MainWindow()
  * **********************************************************************/
 
 //Configure grapgic style and parameters
+void MainWindow::setIcons()
+{
+    //ui->pb_save->setIcon(QIcon("/home/bossoares/Documents/Programação/Embarcados/serialMonitor/source/images/Save-icon.png"));
+    ui->pb_save->setIcon(QIcon("./images/Save-icon.png"));
+    qDebug() << "Set icon" << QDir::currentPath() ;
+}
 void MainWindow::setGraphicEnvironment()
 {
     ui->plot->addGraph();
@@ -133,7 +140,7 @@ void MainWindow::addPoint(double y)
 
 
 /* **********************************************************************
- *              Control Elements Actions (Buttons & etc
+ *              Control Elements Actions (Buttons & etc)
  * **********************************************************************/
 void MainWindow::on_pb_connect_clicked()
 {
@@ -163,4 +170,11 @@ void MainWindow::on_pb_disconnect_clicked()
      {
          qDebug() << "Connection not possible.";
      }
+}
+
+void MainWindow::on_pb_save_clicked()
+{
+    fileControl *fileControl_ = new fileControl();
+    qDebug() << "[MainWindow] Request to save data to .txt";
+    fileControl_->write(&qv_y);
 }

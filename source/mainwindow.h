@@ -6,6 +6,7 @@
 #include <QSerialPort>
 
 #include "comunicacaoserial.h"
+#include "filecontrol.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -18,7 +19,7 @@ class MainWindow : public QMainWindow
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
-
+    void setIcons();
     void setGraphicEnvironment();
     void addPoint(double y);
     void plot();
@@ -30,6 +31,8 @@ private slots:
     //Layout elements
     void on_pb_connect_clicked();
     void on_pb_disconnect_clicked();
+
+    void on_pb_save_clicked();
 
 private:
     Ui::MainWindow *ui;

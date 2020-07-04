@@ -19,6 +19,8 @@ class MainWindow : public QMainWindow
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
+    void clearData();
+    void saveToPersistence();
     void setIcons();
     void setGraphicEnvironment();
     void addPoint(double y);
@@ -38,7 +40,7 @@ private:
     Ui::MainWindow *ui;
     QSerialPort *serial;
     comunicacaoSerial *comunicacaoSerial_;
-    QVector<double> qv_x{0}, qv_y{0};
+    QVector<double> qv_x{0}, qv_y{0}, qv_y_persistence;
  //   comunicacaoSerial *comunicacaoSerial;
 };
 #endif // MAINWINDOW_H

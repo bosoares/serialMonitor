@@ -106,27 +106,45 @@ void MainWindow::setGraphicEnvironment()
 void MainWindow::plot()
 {
     ui->plot->graph(0)->setData(qv_x,qv_y);
-    if(qv_x.last()>1000)
+    if(qv_x.last()>1000) //Clear the screen when it hit the end of the chart
     {
-        double buffer;
-        buffer = qv_y.last();
-        qv_y.clear();
-        qv_y.push_back(buffer);
-        qv_x.clear();
-        qv_x.push_back(0);
-     }
+        saveToPersistence();
+    }
     ui->plot->replot();
     ui->plot->update();
 }
+/* **********************************************************************
+ *              Data handler
+ * **********************************************************************/
+void MainWindow::saveToPersistence()
+{
+    qv_y_persistence.append(qv_y); //save historical data to persistence file
+    qv_y.clear();
+    qv_y.push_back(qv_y_persistence.last()); //plot() need a valid point
+    qv_y_persistence.pop_back(); //remove last element, otherwise it will be duplicated
 
+    qv_x.clear();
+    qv_x.push_back(0);
+}
+
+void MainWindow::clearData()
+{
+    qv_y_persistence.clear();
+    qv_y.clear();
+    qv_x.push_back(0);
+    qv_x.clear();
+    qv_x.push_back(0);
+}
 /* **********************************************************************
  *              Serial communication
  * **********************************************************************/
 
 //Handles serial reception signal
 void MainWindow::serialReceived(){
-    ui->label->setText(serial->readLine());
-    addPoint(ui->label->text().toDouble());
+    QString bufferSerial;
+    bufferSerial = serial->readLine();
+    //ui->label->setText(serial->readLine());
+    addPoint(bufferSerial.toDouble());
     plot();
 }
 
@@ -149,7 +167,9 @@ void MainWindow::on_pb_connect_clicked()
         ui->cb_serialDevices->setEnabled(false);
         ui->cb_baudRate->setEnabled(false);
         ui->pb_connect->setEnabled(false);
+        ui->pb_save->setEnabled(false);
         ui->pb_disconnect->setEnabled(true);
+        clearData();
     }
     else
     {
@@ -164,6 +184,7 @@ void MainWindow::on_pb_disconnect_clicked()
          ui->cb_serialDevices->setEnabled(true);
          ui->cb_baudRate->setEnabled(true);
          ui->pb_connect->setEnabled(true);
+         ui->pb_save->setEnabled(true);
          ui->pb_disconnect->setEnabled(false);
      }
      else
@@ -176,5 +197,6 @@ void MainWindow::on_pb_save_clicked()
 {
     fileControl *fileControl_ = new fileControl();
     qDebug() << "[MainWindow] Request to save data to .txt";
-    fileControl_->write(&qv_y);
+    saveToPersistence();
+    fileControl_->write(&qv_y_persistence);
 }

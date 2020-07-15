@@ -141,11 +141,15 @@ void MainWindow::clearData()
 
 //Handles serial reception signal
 void MainWindow::serialReceived(){
-    QString bufferSerial;
-    bufferSerial = serial->readLine();
-    //ui->label->setText(serial->readLine());
-    addPoint(bufferSerial.toDouble());
-    plot();
+//    QString bufferSerial;
+//    bufferSerial = serial->readLine();
+//    addPoint(bufferSerial.toDouble());
+//    plot();
+    const QByteArray data = serial->readAll();
+    for (int i = 0; i < data.size(); ++i) {
+        QString text = QObject::tr("%1").arg(uchar(data.at(i)));
+        ui->tx_receivedData->append(text);
+    }
 }
 
 //Save data from serial port

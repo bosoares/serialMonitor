@@ -2,6 +2,8 @@
 #include "ui_mainwindow.h"
 #include <QSerialPort>
 #include <QDebug>
+#include <iostream>
+#include <string>
 
 /* **********************************************************************
  *              Constructor & Destructor
@@ -51,7 +53,7 @@ void MainWindow::setGraphicEnvironment()
     ui->plot->addGraph();
     ui->plot->graph(0)->setPen(QPen(Qt::green));
     ui->plot->xAxis->setRange(0,1000);
-    ui->plot->yAxis->setRange(-1,1);
+    ui->plot->yAxis->setRange(0,255);
 
     ui->plot->yAxis->setLabelColor(Qt::white);
     ui->plot->xAxis->setLabelColor(Qt::white);
@@ -141,15 +143,30 @@ void MainWindow::clearData()
 
 //Handles serial reception signal
 void MainWindow::serialReceived(){
-//    QString bufferSerial;
+    QString bufferSerial;
 //    bufferSerial = serial->readLine();
-//    addPoint(bufferSerial.toDouble());
-//    plot();
+
     const QByteArray data = serial->readAll();
     for (int i = 0; i < data.size(); ++i) {
-        QString text = QObject::tr("%1").arg(uchar(data.at(i)));
-        ui->tx_receivedData->append(text);
+        bufferSerial = QObject::tr("%1").arg(uchar(data.at(i)));
+        //ui->tx_receivedData->append(bufferSerial);
+        qv_y.push_back(bufferSerial.toDouble());
+        //qDebug() << qv_y.last();
+        //qDebug() << bufferSerial.toInt();
     }
+        //qDebug() << qv_y.last();
+//    bool ok;
+//    int num = std::stoi("123");
+//    if (!ok) {
+//        qDebug() << "Conversion failed!";
+//      // conversion failed
+//    }
+//    else
+//    {
+//        qDebug() << num;
+//    }
+    addPoint(bufferSerial.toDouble());
+    plot();
 }
 
 //Save data from serial port
@@ -157,7 +174,7 @@ void MainWindow::addPoint(double y)
 {
     qv_y.append(y);
     qv_x.append(qv_x.last()+3);
-    ui->tx_receivedData->append(QString::number(y));
+    //ui->tx_receivedData->append(QString::number(y));
 }
 
 

@@ -140,20 +140,10 @@
      </property>
     </widget>
    </widget>
-   <widget class="QTextBrowser" name="tx_receivedData">
-    <property name="geometry">
-     <rect>
-      <x>510</x>
-      <y>40</y>
-      <width>81</width>
-      <height>111</height>
-     </rect>
-    </property>
-   </widget>
    <widget class="QPushButton" name="pb_save">
     <property name="geometry">
      <rect>
-      <x>1050</x>
+      <x>490</x>
       <y>40</y>
       <width>51</width>
       <height>51</height>
@@ -173,19 +163,23 @@
      </size>
     </property>
    </widget>
-   <widget class="QLabel" name="label_4">
+   <widget class="QTextBrowser" name="tx_receivedData">
+    <property name="enabled">
+     <bool>true</bool>
+    </property>
     <property name="geometry">
      <rect>
-      <x>510</x>
-      <y>20</y>
-      <width>81</width>
-      <height>17</height>
+      <x>500</x>
+      <y>60</y>
+      <width>21</width>
+      <height>16</height>
      </rect>
     </property>
-    <property name="text">
-     <string>Last entries</string>
-    </property>
    </widget>
+   <zorder>tx_receivedData</zorder>
+   <zorder>plot</zorder>
+   <zorder>groupBox</zorder>
+   <zorder>pb_save</zorder>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">

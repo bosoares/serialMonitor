@@ -4,6 +4,7 @@
 #include <QMainWindow>
 #include <QDebug>
 #include <QSerialPort>
+#include <qcustomplot.h>
 
 #include "comunicacaoserial.h"
 #include "filecontrol.h"

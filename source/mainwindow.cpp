@@ -14,9 +14,11 @@ MainWindow::MainWindow(QWidget *parent)
 {
     //Initialize objects
     ui->setupUi(this);
+    ui->plot->setOpenGl(true);
 
     serial = new QSerialPort(this);
     comunicacaoSerial_ = new comunicacaoSerial(serial);
+
 
     //Setup Graphic environment
     setGraphicEnvironment();
@@ -27,8 +29,6 @@ MainWindow::MainWindow(QWidget *parent)
 
     //Set signal(s)
     connect(serial,SIGNAL(readyRead()), this, SLOT(serialReceived()));
-
-
 }
 
 MainWindow::~MainWindow()
@@ -50,10 +50,15 @@ void MainWindow::setIcons()
 }
 void MainWindow::setGraphicEnvironment()
 {
+    qDebug() << ui->plot->openGl();
     ui->plot->addGraph();
     ui->plot->graph(0)->setPen(QPen(Qt::green));
+    ui->plot->setNoAntialiasingOnDrag(true);
+
     ui->plot->xAxis->setRange(0,1000);
-    ui->plot->yAxis->setRange(0,255);
+    //ui->plot->yAxis->setRange(0,255);
+    //teste 31/07
+    ui->plot->yAxis->setRange(0,5);
 
     ui->plot->yAxis->setLabelColor(Qt::white);
     ui->plot->xAxis->setLabelColor(Qt::white);
@@ -71,6 +76,7 @@ void MainWindow::setGraphicEnvironment()
     ui->plot->xAxis->setTickLabels(false);
     ui->plot->yAxis->setTickLabelColor(Qt::white);
 
+    //comertar aqui para desabilitar maquiagem
     ui->plot->xAxis->grid()->setPen(QPen(QColor(140, 140, 140), 1, Qt::DotLine));
     ui->plot->yAxis->grid()->setPen(QPen(QColor(140, 140, 140), 1, Qt::DotLine));
 
@@ -81,7 +87,7 @@ void MainWindow::setGraphicEnvironment()
     ui->plot->xAxis->grid()->setZeroLinePen(Qt::NoPen);
     ui->plot->yAxis->grid()->setZeroLinePen(Qt::NoPen);
 
-    //ui->plot->yAxis->setUpperEnding(QCPLineEnding::esSpikeArrow);
+    ui->plot->yAxis->setUpperEnding(QCPLineEnding::esSpikeArrow);
     ui->plot->xAxis->setUpperEnding(QCPLineEnding::esSpikeArrow);
 
     QLinearGradient plotGradient;
@@ -150,7 +156,11 @@ void MainWindow::serialReceived(){
     for (int i = 0; i < data.size(); ++i) {
         bufferSerial = QObject::tr("%1").arg(uchar(data.at(i)));
         //ui->tx_receivedData->append(bufferSerial);
-        qv_y.push_back(bufferSerial.toDouble());
+        qv_x.push_back(qv_x.last()+0.1);
+
+        //qv_y.push_back(bufferSerial.toDouble()); teste 31/07
+
+        qv_y.push_back(bufferSerial.toDouble()*0.0196);
         //qDebug() << qv_y.last();
         //qDebug() << bufferSerial.toInt();
     }
@@ -165,15 +175,15 @@ void MainWindow::serialReceived(){
 //    {
 //        qDebug() << num;
 //    }
-    addPoint(bufferSerial.toDouble());
+    //addPoint(bufferSerial.toDouble());
     plot();
 }
 
 //Save data from serial port
 void MainWindow::addPoint(double y)
 {
-    qv_y.append(y);
-    qv_x.append(qv_x.last()+3);
+    //qv_y.append(y);
+    qv_x.push_back(qv_x.last()+1);
     //ui->tx_receivedData->append(QString::number(y));
 }
 

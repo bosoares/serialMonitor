@@ -37,11 +37,14 @@ private slots:
 
     void on_pb_save_clicked();
 
+    void on_db_time_div_valueChanged(int value);
+
 private:
     Ui::MainWindow *ui;
     QSerialPort *serial;
     comunicacaoSerial *comunicacaoSerial_;
     QVector<double> qv_x{0}, qv_y{0}, qv_y_persistence;
+    float time_div;
  //   comunicacaoSerial *comunicacaoSerial;
 };
 #endif // MAINWINDOW_H

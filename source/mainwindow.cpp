@@ -56,9 +56,9 @@ void MainWindow::setGraphicEnvironment()
     ui->plot->setNoAntialiasingOnDrag(true);
 
     ui->plot->xAxis->setRange(0,1000);
-    //ui->plot->yAxis->setRange(0,255);
+    ui->plot->yAxis->setRange(0,255);
     //teste 31/07
-    ui->plot->yAxis->setRange(0,5);
+    //ui->plot->yAxis->setRange(0,5);
 
     ui->plot->yAxis->setLabelColor(Qt::white);
     ui->plot->xAxis->setLabelColor(Qt::white);
@@ -93,17 +93,20 @@ void MainWindow::setGraphicEnvironment()
     QLinearGradient plotGradient;
     plotGradient.setStart(0,-1);
     plotGradient.setFinalStop(1000, 1);
-    plotGradient.setColorAt(0, QColor(80, 80, 80));
+    plotGradient.setColorAt(0, QColor(60, 60, 60));
     plotGradient.setColorAt(1, QColor(50, 50, 50));
     ui->plot->setBackground(plotGradient);
 
     QLinearGradient axisRectGradient;
     axisRectGradient.setStart(0, -1);
     axisRectGradient.setFinalStop(1000, 1);
-    axisRectGradient.setColorAt(0, QColor(80, 80, 80));
+    axisRectGradient.setColorAt(0, QColor(60, 60, 60));
     axisRectGradient.setColorAt(1, QColor(30, 30, 30));
     ui->plot->axisRect()->setBackground(axisRectGradient);
 
+    //Initialize time_div
+    time_div = ui->db_time_div->value()/10;
+    ui->lb_time_div->setText(QString::number((float)ui->db_time_div->value()/40));
 }
 
 /* **********************************************************************
@@ -157,10 +160,12 @@ void MainWindow::serialReceived(){
         bufferSerial = QObject::tr("%1").arg(uchar(data.at(i)));
         //ui->tx_receivedData->append(bufferSerial);
         qv_x.push_back(qv_x.last()+0.1);
+        //qv_x.push_back(qv_x.last()+time_div);
 
         //qv_y.push_back(bufferSerial.toDouble()); teste 31/07
 
-        qv_y.push_back(bufferSerial.toDouble()*0.0196);
+        qv_y.push_back(bufferSerial.toDouble()); //converts from 0-255 to 0V-5V
+       // qv_y.push_back(bufferSerial.toDouble()*0.0196); //converts from 0-255 to 0V-5V
         //qDebug() << qv_y.last();
         //qDebug() << bufferSerial.toInt();
     }
@@ -192,7 +197,7 @@ void MainWindow::addPoint(double y)
  *              Control Elements Actions (Buttons & etc)
  * **********************************************************************/
 void MainWindow::on_pb_connect_clicked()
-{
+{    
     if(comunicacaoSerial_->createConnection(ui->cb_serialDevices->currentText(),ui->cb_baudRate->currentText().toInt()))
     {
         ui->cb_serialDevices->setEnabled(false);
@@ -230,4 +235,11 @@ void MainWindow::on_pb_save_clicked()
     qDebug() << "[MainWindow] Request to save data to .txt";
     saveToPersistence();
     fileControl_->write(&qv_y_persistence);
+}
+
+void MainWindow::on_db_time_div_valueChanged(int value)
+{
+    time_div = value/10;
+    float ms_div = (float)value/40;
+    ui->lb_time_div->setText(QString::number(ms_div));
 }
